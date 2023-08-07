@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// NotificationType - represents the type of notification.
 type NotificationType string
 
 const (
@@ -15,6 +16,7 @@ const (
 	Marketing NotificationType = "marketing"
 )
 
+// NotificationService - provides interface to send notifications.
 type NotificationService interface {
 	SendNotification(notificationType NotificationType, user string) error
 }
@@ -30,12 +32,14 @@ type rateLimit struct {
 	duration      time.Duration
 }
 
+// NewNotificationService - creates a new instance of NotificationService.
 func NewNotificationService() NotificationService {
 	return &notificationService{
 		rateLimits: make(map[string]map[NotificationType]rateLimit),
 	}
 }
 
+// SendNotification - sends provided notification type to users.
 func (ns *notificationService) SendNotification(notificationType NotificationType, user string) error {
 	ns.mu.Lock()
 	defer ns.mu.Unlock()

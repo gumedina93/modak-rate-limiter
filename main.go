@@ -6,15 +6,15 @@ import (
 )
 
 func main() {
-	ns := NewNotificationService()
-	user := "user@example.com"
+	notifier := NewNotificationService()
+	user1 := "user1"
 
 	var wg sync.WaitGroup
 	for i := 0; i < 4; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err := ns.SendNotification(News, user)
+			err := notifier.SendNotification(News, user1)
 			if err != nil {
 				fmt.Println(err)
 			}
