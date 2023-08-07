@@ -7,15 +7,21 @@ import (
 	"time"
 )
 
+// NotificationType - represents the type of notification.
 type NotificationType string
 
 const (
 	Status    NotificationType = "status"
-	News                       = "news"
-	Marketing                  = "marketing"
+	News      NotificationType = "news"
+	Marketing NotificationType = "marketing"
 )
 
-type NotificationService struct {
+// NotificationService - provides interface to send notifications.
+type NotificationService interface {
+	SendNotification(notificationType NotificationType, user string) error
+}
+
+type notificationService struct {
 	mu         sync.Mutex
 	rateLimits map[string]map[NotificationType]rateLimit
 }
@@ -26,13 +32,15 @@ type rateLimit struct {
 	duration      time.Duration
 }
 
-func NewNotificationService() *NotificationService {
-	return &NotificationService{
+// NewNotificationService - creates a new instance of NotificationService.
+func NewNotificationService() NotificationService {
+	return &notificationService{
 		rateLimits: make(map[string]map[NotificationType]rateLimit),
 	}
 }
 
-func (ns *NotificationService) SendNotification(notificationType NotificationType, user string) error {
+// SendNotification - sends provided notification type to users.
+func (ns *notificationService) SendNotification(notificationType NotificationType, user string) error {
 	ns.mu.Lock()
 	defer ns.mu.Unlock()
 
