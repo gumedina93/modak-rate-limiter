@@ -11,11 +11,15 @@ type NotificationType string
 
 const (
 	Status    NotificationType = "status"
-	News                       = "news"
-	Marketing                  = "marketing"
+	News      NotificationType = "news"
+	Marketing NotificationType = "marketing"
 )
 
-type NotificationService struct {
+type NotificationService interface {
+	SendNotification(notificationType NotificationType, user string) error
+}
+
+type notificationService struct {
 	mu         sync.Mutex
 	rateLimits map[string]map[NotificationType]rateLimit
 }
@@ -26,13 +30,13 @@ type rateLimit struct {
 	duration      time.Duration
 }
 
-func NewNotificationService() *NotificationService {
-	return &NotificationService{
+func NewNotificationService() NotificationService {
+	return &notificationService{
 		rateLimits: make(map[string]map[NotificationType]rateLimit),
 	}
 }
 
-func (ns *NotificationService) SendNotification(notificationType NotificationType, user string) error {
+func (ns *notificationService) SendNotification(notificationType NotificationType, user string) error {
 	ns.mu.Lock()
 	defer ns.mu.Unlock()
 
